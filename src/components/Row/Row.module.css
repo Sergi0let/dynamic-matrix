@@ -1,0 +1,4 @@
+.row {
+  /* background: #111cf8; */
+  border: 1px solid var(--text-color);
+}

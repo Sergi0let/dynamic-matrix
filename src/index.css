@@ -8,10 +8,22 @@
   margin: 0;
 }
 
-body {
-  line-height: 1.5;
+:root {
+  --bg-primary: #1f1f1f;
+  --bg-secondary: #cecece;
+  --bg-tetriary: #ffffff;
 
+  --txt-primary: #fff;
+  --txt-secondary: #333;
+
+  --border-primary: #cecece;
+}
+
+body {
+  font: 1rem/1.5 "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+  background: var(--bg-primary);
+  color: var(--txt-primary);
 }
 
 img,
@@ -28,6 +40,7 @@ button,
 textarea,
 select {
   font: inherit;
+  all: unset;
 }
 
 p,
@@ -52,7 +65,51 @@ h6 {
   text-wrap: balance;
 }
 
+table {
+  table-layout: fixed; /* Всі стовпці будуть однаковими */
+  width: auto;
+  border-collapse: collapse;
+}
+
+td,
+th {
+  text-align: center;
+  border: 1px solid var(--border-primary);
+  overflow: hidden;
+  white-space: nowrap;
+}
+td {
+  width: 50px;
+  min-width: 50px;
+  cursor: pointer;
+}
+
 #root,
 #__next {
   isolation: isolate;
+}
+
+/* styles */
+.app {
+  max-width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.heading h1 {
+  font-size: 1.5rem;
+}
+
+.heading div {
+  margin-inline: auto;
 }
