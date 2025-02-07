@@ -1,6 +1,14 @@
-.table {
-  padding-block: 2rem;
+.wrapper {
+  padding-block: 1rem;
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline mandatory;
+}
+.wrapper table {
   margin-inline: auto;
+  scroll-snap-type: inline mandatory;
+  scroll-snap-align: start;
 }
 .tableSum,
 .tablePercentage {
@@ -17,4 +25,13 @@
   height: 50px;
   min-height: 50px;
   min-width: 50px;
+}
+
+@media (min-width: 550px) {
+  .wrapper {
+    padding-inline: 2rem;
+  }
+  .wrapper table {
+    scroll-margin-inline: 2rem;
+  }
 }

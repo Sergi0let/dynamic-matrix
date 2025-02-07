@@ -17,13 +17,16 @@
   --txt-secondary: #333;
 
   --border-primary: #cecece;
+
+  --warning: #ff3a3a;
 }
 
 body {
-  font: 1rem/1.5 "Segoe UI", sans-serif;
+  font: 1rem/1.5 Montserrat, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   background: var(--bg-primary);
   color: var(--txt-primary);
+  min-width: 550px;
 }
 
 img,
@@ -71,19 +74,6 @@ table {
   border-collapse: collapse;
 }
 
-td,
-th {
-  text-align: center;
-  border: 1px solid var(--border-primary);
-  overflow: hidden;
-  white-space: nowrap;
-}
-td {
-  width: 50px;
-  min-width: 50px;
-  cursor: pointer;
-}
-
 #root,
 #__next {
   isolation: isolate;
@@ -96,7 +86,7 @@ td {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  max-width: 1440px;
+
   margin: 0 auto;
 }
 

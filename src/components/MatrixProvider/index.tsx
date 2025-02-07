@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { defaultMatrixValues, MatrixContext } from "../../context/MatrixContext";
-import { Cell, Matrix, MatrixValuesType, Row } from "../../types";
+import { CellType, MatrixType, MatrixValuesType, RowType } from "../../types";
 
 type MatrixProviderProps = {
   children: ReactNode;
@@ -9,14 +9,14 @@ type MatrixProviderProps = {
 
 export function MatrixProvider({ children }: MatrixProviderProps) {
   const [matrixValues, setMatrixValues] = useState<MatrixValuesType>(defaultMatrixValues);
-  const [matrix, setMatrix] = useState<Matrix>([]);
+  const [matrix, setMatrix] = useState<MatrixType>([]);
 
   const addRow = () => {
-    const newRow: Row = {
+    const newRow: RowType = {
       id: uuidv4(),
       cells: [],
     };
-    // Припустимо, що кількість клітинок у новому рядку має бути такою ж, як у першому рядку матриці або взята з matrixValues.n
+
     const numCells = matrixValues.n;
     for (let j = 0; j < numCells; j++) {
       newRow.cells.push({
@@ -33,8 +33,7 @@ export function MatrixProvider({ children }: MatrixProviderProps) {
     setMatrix(newMatrix);
   };
 
-  const handleCellClick = (cellId: string) => {
-    // Знайти рядок і клітинку за унікальним id
+  const increaseCellAmount = (cellId: string) => {
     setMatrix((prevMatrix) => {
       return prevMatrix.map((row) => ({
         ...row,
@@ -48,31 +47,31 @@ export function MatrixProvider({ children }: MatrixProviderProps) {
     });
   };
 
-  const createMatrix = (rows: number, cols: number): Matrix => {
-    const generatedMatrix: Row[] = [];
+  const createMatrix = (rows: number, cols: number): MatrixType => {
+    const generatedMatrix: RowType[] = [];
 
     for (let i = 0; i < rows; i++) {
-      const cells: Cell[] = [];
+      const cells: CellType[] = [];
       for (let j = 0; j < cols; j++) {
-        const cell: Cell = {
+        const cell: CellType = {
           id: uuidv4(),
           amount: Math.floor(Math.random() * 900) + 100, // випадкове число від 100 до 999
         };
         cells.push(cell);
       }
-      const row: Row = {
+      const row: RowType = {
         id: uuidv4(),
         cells,
       };
       generatedMatrix.push(row);
     }
-    console.log("Generated matrix", generatedMatrix);
+
     return generatedMatrix;
   };
 
   useEffect(() => {
     const newMatrix = createMatrix(matrixValues.m, matrixValues.n);
-    console.log("New matrix", newMatrix);
+
     setMatrix(newMatrix);
   }, [matrixValues.m, matrixValues.n]);
 
@@ -84,7 +83,7 @@ export function MatrixProvider({ children }: MatrixProviderProps) {
         setMatrixValues,
         setMatrix,
         createMatrix,
-        handleCellClick,
+        increaseCellAmount,
         addRow,
         removeRow,
       }}

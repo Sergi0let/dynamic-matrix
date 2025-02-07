@@ -1,28 +1,28 @@
-import { useRef, useState } from "react";
-import useMatrixContext from "../../hooks/useMatrixContext";
-import { Cell as CellType, Matrix } from "../../types";
-import { findClosestCells } from "../../utils";
-import Cell from "../Cell";
-import Row from "../Row";
-import s from "./Table.module.css";
+import { useMemo, useRef, useState } from "react"
+import { v4 as uuidv4 } from "uuid"
+import useMatrixContext from "../../hooks/useMatrixContext"
+import { CellType, MatrixType } from "../../types"
+import { findClosestCells } from "../../utils"
+import Cell from "../Cell"
+import Row from "../Row"
+import s from "./Table.module.css"
+import TableRow from "./TableRow"
 
 const Table = () => {
-  const { matrix, handleCellClick, matrixValues } = useMatrixContext();
+  const { matrix, increaseCellAmount, matrixValues } = useMatrixContext();
   const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
-  const { x } = matrixValues;
+  const { x: highlightedAmount } = matrixValues;
   const lastHoveredIdRef = useRef<string | null>(null);
+  const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
 
-  function computeColumnMedians(matrix: Matrix): number[] {
+  const getColumnMedians = (matrix: MatrixType): CellType[] => {
     if (matrix.length === 0) return [];
 
-    // Кількість колонок припускаємо за кількістю клітинок у першому рядку
     const numColumns = matrix[0].cells.length;
-    const medians: number[] = [];
+    const medians: CellType[] = [];
 
     for (let col = 0; col < numColumns; col++) {
-      // Збираємо значення з колонки
       const columnValues = matrix.map((row) => row.cells[col].amount);
-      // Сортуємо значення за зростанням
       columnValues.sort((a, b) => a - b);
 
       const len = columnValues.length;
@@ -30,120 +30,79 @@ const Table = () => {
       let median: number;
 
       if (len % 2 === 0) {
-        // Якщо парна кількість елементів, обчислюємо середнє арифметичне двох центральних
         median = (columnValues[mid - 1] + columnValues[mid]) / 2;
       } else {
-        // Якщо непарна – беремо центральне значення
         median = columnValues[mid];
       }
-      medians.push(median);
+      medians.push({ amount: median, id: uuidv4() });
     }
+
     return medians;
-  }
+  };
+  const mediansData = useMemo(() => getColumnMedians(matrix), [matrix]);
 
-  const columnMedians = computeColumnMedians(matrix);
-
-  const handleClick = (e: React.MouseEvent<HTMLTableSectionElement, MouseEvent>) => {
+  const handleIncreaseAmount = (e: React.MouseEvent<HTMLTableSectionElement, MouseEvent>) => {
     e.preventDefault();
+
     const cell = e.target as HTMLTableCellElement;
     const cellId = cell.getAttribute("data-cell-id");
-    if (!cellId) return;
 
-    handleCellClick(cellId);
+    if (!cellId) return;
+    increaseCellAmount(cellId);
   };
 
-  // Обробник події на рівні таблиці
-  const handleMouseOver = (e: React.MouseEvent<HTMLTableSectionElement, MouseEvent>) => {
-    if (x === 0) return;
-    // Використовуємо делегування: перевіряємо, чи target є <td> та чи містить data-cell-id
+  const handleHighlightedCell = (e: React.MouseEvent<HTMLTableSectionElement, MouseEvent>) => {
+    if (highlightedAmount === 0) return;
+
     const target = e.target as HTMLTableCellElement;
 
-    if (target.tagName !== "TD" || !target.dataset.cellId) {
-      return;
-    }
+    if (target.tagName !== "TD" || !target.dataset.cellId) return;
 
     const cellId = target.getAttribute("data-cell-id");
-    console.log("Mouse over", cellId);
 
-    // Якщо ми вже наведені на цю клітинку, нічого не робимо
-    if (lastHoveredIdRef.current === cellId) {
-      return;
-    }
+    if (lastHoveredIdRef.current === cellId) return;
+
     lastHoveredIdRef.current = cellId;
 
-    // Знайдемо відповідну клітинку у матриці
     const allCells: CellType[] = matrix.flatMap((row) => row.cells);
     const hoveredCell = allCells.find((cell) => cell.id === cellId);
+
     if (hoveredCell) {
-      const closestIds = findClosestCells(matrix, hoveredCell, x);
+      const closestIds = findClosestCells(matrix, hoveredCell, highlightedAmount);
       setHighlightedIds(closestIds);
     }
   };
 
-  // Обробник, який скидає підсвічування при відході курсору від таблиці
-  const handleMouseLeave = () => {
+  const handleResetHighlightedCell = () => {
     setHighlightedIds(new Set());
     lastHoveredIdRef.current = null;
   };
 
-  const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
-  console.log(hoveredRowId);
-  const handleSumMouseEnter = (rowId: string) => {
-    setHoveredRowId(rowId);
-  };
+  const handleHighlighteRow = (rowId: string) => setHoveredRowId(rowId);
 
-  const handleSumMouseLeave = () => {
-    setHoveredRowId(null);
-  };
+  const handleResetHighlighteRow = () => setHoveredRowId(null);
 
   return (
-    <div className={s.table}>
+    <div className={s.wrapper}>
       <table>
-        <thead></thead>
-        <tbody onClick={handleClick} onMouseMove={handleMouseOver} onMouseLeave={handleMouseLeave}>
-          {matrix.map((row) => {
-            const sumRow = row.cells.reduce((acc, cell) => acc + cell.amount, 0);
-            const isRowHovered = hoveredRowId === row.id;
-            const maxInRow = isRowHovered ? Math.max(...row.cells.map((cell) => cell.amount)) : 0;
-
-            return (
-              <>
-                <Row key={row.id}>
-                  {row.cells.map((cell) => {
-                    if (isRowHovered) {
-                      // Обчислення відсотка для клітинки (відносно суми рядка)
-                      const cellPercent = ((cell.amount / sumRow) * 100).toFixed(0);
-                      // Теплова карта – фон залежить від відношення до максимального значення
-                      const heatRatio = cell.amount / maxInRow;
-                      return (
-                        <td
-                          key={cell.id}
-                          style={{
-                            border: "1px solid #ccc",
-                            backgroundColor: `rgba(148,255,0, ${heatRatio})`,
-                          }}
-                        >
-                          {cellPercent}%
-                        </td>
-                      );
-                    } else {
-                      return <Cell key={cell.id} isHighlighted={highlightedIds.has(cell.id)} {...cell} />;
-                    }
-                  })}
-                  <td
-                    className={s.tableSum}
-                    onMouseEnter={() => handleSumMouseEnter(row.id)}
-                    onMouseLeave={handleSumMouseLeave}
-                  >
-                    {sumRow}
-                  </td>
-                </Row>
-              </>
-            );
-          })}
-          <Row className={s.tablePercentage}>
-            {columnMedians.map((median, i) => (
-              <td key={i}>{median}</td>
+        <tbody
+          onClick={handleIncreaseAmount}
+          onMouseMove={handleHighlightedCell}
+          onMouseLeave={handleResetHighlightedCell}
+        >
+          {matrix.map((row) => (
+            <TableRow
+              key={row.id}
+              row={row}
+              hoveredRowId={hoveredRowId}
+              handleHighlighteRow={handleHighlighteRow}
+              handleResetHighlighteRow={handleResetHighlighteRow}
+              highlightedIds={highlightedIds}
+            />
+          ))}
+          <Row key={uuidv4()} className={s.tablePercentage}>
+            {mediansData.map(({ id, amount }) => (
+              <Cell key={id} amount={amount} id={id} />
             ))}
           </Row>
         </tbody>

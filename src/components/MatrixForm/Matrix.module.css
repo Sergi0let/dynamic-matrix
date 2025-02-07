@@ -3,6 +3,7 @@
   border: 1px solid var(--border-primary);
   border-radius: 0.4rem;
   padding: 1rem;
+  display: flex;
 }
 .mxform label {
   margin-inline-end: 1rem;
@@ -32,9 +33,45 @@
   transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 .mxform button[type="submit"]:not(:disabled) {
-  background: red;
+  background: rgb(8, 143, 42);
 }
 .mxform button[type="submit"]:disabled {
   background: gray;
+  cursor: not-allowed;
+}
+.mxform input[type="text"]:disabled {
+  background: var(--bg-primary);
+  color: var(--bg-primary);
+  border: 1px solid var(--border-secondary);
+}
+
+.btn-block {
+  margin: 0.5rem;
+  padding-inline: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+}
+.btn:hover {
+  color: var(--warning);
+}
+.btn:hover svg {
+  fill: var(--warning);
+}
+.btn svg {
+  width: 32px;
+  height: 24px;
+  fill: var(--txt-primary);
+}
+.btn:disabled {
   cursor: not-allowed;
 }

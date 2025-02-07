@@ -1,21 +1,24 @@
 export type CellIdType = string;
-export type CellValue = number;
+export type CellValueType = number;
 
-export type Cell = {
+export type CellType = {
   id: CellIdType;
-  amount: CellValue;
+  amount: CellValueType;
 };
 
-export type Row = {
+export type RowType = {
   id: string;
-  cells: Cell[];
+  cells: CellType[];
 };
 
-// Matrix визначається як масив Row
-export type Matrix = Row[];
+export type MatrixType = RowType[];
 
 export type MatrixValuesType = {
   m: number;
   n: number;
   x: number;
+};
+
+export type SvgProps = {
+  className?: string;
 };

@@ -1,13 +1,13 @@
 import { createContext } from "react";
-import { Matrix, MatrixValuesType } from "../types";
+import { MatrixType, MatrixValuesType } from "../types";
 
 export type MatrixContextType = {
   matrixValues: MatrixValuesType;
-  matrix: Matrix;
+  matrix: MatrixType;
   setMatrixValues: (values: MatrixValuesType) => void;
-  setMatrix: (matrix: Matrix) => void;
-  createMatrix: (rows: number, cols: number) => Matrix;
-  handleCellClick: (cellId: string) => void;
+  setMatrix: (matrix: MatrixType) => void;
+  createMatrix: (rows: number, cols: number) => MatrixType;
+  increaseCellAmount: (cellId: string) => void;
   addRow: () => void;
   removeRow: () => void;
 };
@@ -24,7 +24,7 @@ const defaultContext: MatrixContextType = {
   matrix: [],
   setMatrix: () => {},
   createMatrix: () => [],
-  handleCellClick: () => {},
+  increaseCellAmount: () => {},
   addRow: () => {},
   removeRow: () => {},
 };

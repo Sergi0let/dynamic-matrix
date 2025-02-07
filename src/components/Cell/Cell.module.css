@@ -1,4 +1,12 @@
 .cell {
   color: var(--txt-primary);
   border: 1px solid var(--border-primary);
+  width: 50px;
+  min-width: 50px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s;
+}
+.cell:hover {
+  background-color: rgb(211, 133, 250);
 }

@@ -7,7 +7,6 @@ function App() {
     <div className="app">
       <MatrixProvider>
         <div className="heading">
-          <h1>DynamicMatrix </h1>
           <MatrixForm />
         </div>
         <Table />
